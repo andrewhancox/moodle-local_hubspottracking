@@ -1,0 +1,21 @@
+<script type="text/javascript">
+    var _hsq = window._hsq = window._hsq || [];
+    {{#identify}}
+    _hsq.push(["identify", {
+        email: '{{email}}',
+        firstname: '{{firstname}}',
+        lastname: '{{lastname}}',
+        city: '{{city}}',
+        company: '{{company}}',
+        country: '{{country}}',
+        jobtitle: '{{jobtitle}}',
+        phone: '{{phone}}',
+        mobilephone: '{{mobilephone}}',
+        address: '{{address}}',
+    }]);
+    {{/identify}}
+    _hsq.push(['setPath', '{{{pageurl}}}'])
+    ;
+</script>
+<script type="text/javascript" id="hs-script-loader" async="" defer=""
+        src="{{{trackingcodeurl}}}"></script>
