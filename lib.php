@@ -55,6 +55,9 @@ function local_hubspottracking_before_standard_html_head() {
         if (!empty($USER->profile['organisation'])) {
             $identitydata['company'] = $USER->profile['organisation'];
         }
+        if (!empty($USER->profile['school'])) {
+            $identitydata['company'] = $USER->profile['school'];
+        }
         if (!empty($USER->profile['jobtitle'])) {
             $identitydata['jobtitle'] = $USER->profile['orgrole'];
         }
