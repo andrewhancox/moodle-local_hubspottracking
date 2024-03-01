@@ -48,6 +48,20 @@ function local_hubspottracking_before_standard_html_head() {
         $identitydata['mobilephone'] = $USER->phone2;
         $identitydata['address'] = $USER->address;
 
+        global $CFG;
+        require_once("$CFG->dirroot/user/profile/lib.php");
+        profile_load_data($USER);
+
+        if (!empty($USER->profile['organisation'])) {
+            $identitydata['company'] = $USER->profile['organisation'];
+        }
+        if (!empty($USER->profile['jobtitle'])) {
+            $identitydata['jobtitle'] = $USER->profile['orgrole'];
+        }
+        if (!empty($USER->profile['phone'])) {
+            $identitydata['phone'] = $USER->profile['phone'];
+        }
+
         $identitydatachecksum = md5(json_encode($identitydata));
 
         if (
