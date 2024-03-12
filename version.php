@@ -25,6 +25,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2022021016;
+$plugin->version = 2022021017;
 $plugin->requires = 2020061515;
 $plugin->component = 'local_hubspottracking';

@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+use local_hubspottracking\local\identitytracker;
 
 /**
  * @package local_hubspottracking
@@ -23,8 +24,26 @@
  * @copyright 2024, Andrew Hancox
  */
 
+function local_hubspottracking_post_signup_requests($data) {
+    $trackingdata = new stdClass();
+    $trackingdata->profile = [];
+
+    foreach ((array)$data as $key => $value) {
+        $customprofileprefix = 'profile_field_';
+
+        if (core_text::strpos($key, $customprofileprefix) === 0) {
+            $key = core_text::substr($key, core_text::strlen($customprofileprefix));
+            $trackingdata->profile[$key] = $value;
+        } else {
+            $trackingdata->$key = $value;
+        }
+    }
+
+    identitytracker::setidentitydata($trackingdata);
+}
+
 function local_hubspottracking_before_standard_html_head() {
-    global $PAGE, $SESSION, $USER;
+    global $PAGE, $SESSION;
 
     $trackingcodeurl = get_config('local_hubspottracking', 'trackingcodeurl');
 
@@ -33,38 +52,10 @@ function local_hubspottracking_before_standard_html_head() {
     }
 
     $data = [];
-    $USER->lastname = 'changed';
-    if (isloggedin() && !isguestuser()) {
-        $identitydata = [];
+
+    $identitydata = identitytracker::getidentitydata();
+    if ($identitydata) {
         $identitydata['identify'] = true;
-        $identitydata['email'] = $USER->email;
-        $identitydata['firstname'] = $USER->firstname;
-        $identitydata['lastname'] = $USER->lastname;
-        $identitydata['city'] = $USER->city;
-        $identitydata['company'] = $USER->institution;
-        $identitydata['country'] = $USER->country;
-        $identitydata['jobtitle'] = $USER->department;
-        $identitydata['phone'] = $USER->phone1;
-        $identitydata['mobilephone'] = $USER->phone2;
-        $identitydata['address'] = $USER->address;
-
-        global $CFG;
-        require_once("$CFG->dirroot/user/profile/lib.php");
-        profile_load_data($USER);
-
-        if (!empty($USER->profile['organisation'])) {
-            $identitydata['company'] = $USER->profile['organisation'];
-        }
-        if (!empty($USER->profile['school'])) {
-            $identitydata['company'] = $USER->profile['school'];
-        }
-        if (!empty($USER->profile['jobtitle'])) {
-            $identitydata['jobtitle'] = $USER->profile['orgrole'];
-        }
-        if (!empty($USER->profile['phone'])) {
-            $identitydata['phone'] = $USER->profile['phone'];
-        }
-
         $identitydatachecksum = md5(json_encode($identitydata));
 
         if (
